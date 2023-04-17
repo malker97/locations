@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 300),
                           style: TextStyle(
-                            fontSize: _currentLocation != null ? mph : 0.0,
+                            fontSize: (_currentLocation != null && mph > 14.0) ? mph : 14.0,
                             color: Colors.black,
                           ),
                           child: Text(
