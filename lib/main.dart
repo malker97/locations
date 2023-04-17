@@ -35,7 +35,12 @@ class _MyHomePageState extends State<MyHomePage> {
   StreamSubscription<LocationData>? _locationSubscription;
   double lat = 0.0;
   double long = 0.0;
+  double mph = 0.0;
   String _speedLimit = "";
+  int speedLimit = 0;
+
+  Color backgroundColor = Colors.lightGreen;
+
   void getCurrentLocation(){
     Location location = Location();
     location.getLocation().then((value) => setState(() {
@@ -47,15 +52,17 @@ class _MyHomePageState extends State<MyHomePage> {
     // http://www.overpass-api.de/api/interpreter?data=[out:json];way[%22maxspeed%22](around:10,48.071615,7.338893);out;
     var url = Uri.parse('http://www.overpass-api.de/api/interpreter?data=[out:json];way[%22maxspeed%22](around:10,$lat,$lng);out;');
     var response = await http.get(url);
-    var speedLimit = "";
+    speedLimit = 0;
     if(response.statusCode == 200){
       var body = jsonDecode(response.body);
       if(body['elements'][0]['tags']['maxspeed'] != null){
         print(body['elements'][0]['tags']['maxspeed']);
         _speedLimit = body['elements'][0]['tags']['maxspeed'];
-        // speedLimit = int.parse(body['elements'][0]['tags']['maxspeed']);
-        // return speedLimit;
-        // return int.parse(body['elements'][0]['tags']['maxspeed']);
+        RegExp regex = RegExp(r'\d+');
+        Match? match = regex.firstMatch(_speedLimit);
+        if(match != null){
+          speedLimit = int.parse(match.group(0)!);
+        }
       }
     }
   }
@@ -67,7 +74,18 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentLocation = currentLocation;
         lat = _currentLocation!.latitude!;
         long = _currentLocation!.longitude!;
+        mph = _currentLocation!.speed!*2.23694;
         print("lat: $lat, long: $long");
+        if (mph - speedLimit > 10) {
+          backgroundColor = Colors.red;
+        } else if (mph - speedLimit > 5) {
+          backgroundColor = Colors.yellow;
+        } else if(mph - speedLimit > 0) {
+          double progress = (mph / speedLimit).clamp(0.0, 1.0);
+          backgroundColor = Color.lerp(Colors.yellow, Colors.green, progress)!;
+        }else{
+          backgroundColor = Colors.green;
+        }
       });
     });
     Timer.periodic(Duration(seconds: 1), (timer) async {
@@ -88,24 +106,28 @@ class _MyHomePageState extends State<MyHomePage> {
       // appBar: AppBar(
       //   title: Text(widget.title),
       // ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _currentLocation == null
-              ? CircularProgressIndicator()
-              : Column(
-                  children: [
-                    Text('Latitude: ${_currentLocation!.latitude}'),
-                    Text('Longitude: ${_currentLocation!.longitude}'),
-                    Text('Accuracy: ${_currentLocation!.accuracy}'),
-                    Text('Altitude: ${_currentLocation!.altitude}'),
-                    Text('Speed: ${_currentLocation!.speed}'),
-                    Text('Speed Accuracy: ${_currentLocation!.speedAccuracy}'),
-                    Text('Speed Limit: $_speedLimit')
-                  ],
-                ),
-          ],
+      body: Container(
+        color: backgroundColor, // 设置背景颜色为绿色
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _currentLocation == null
+                ? CircularProgressIndicator()
+                : Column(
+                    children: [
+                      Text('Latitude: ${_currentLocation!.latitude}'),
+                      Text('Longitude: ${_currentLocation!.longitude}'),
+                      Text('Accuracy: ${_currentLocation!.accuracy}'),
+                      Text('Altitude: ${_currentLocation!.altitude}'),
+                      // In meters/second
+                      Text('Speed: ${_currentLocation != null ? mph.toInt() : 0.0 } mph'),
+                      Text('Speed Accuracy: ${_currentLocation!.speedAccuracy}'),
+                      Text('Speed Limit: $speedLimit mph'),
+                    ],
+                  ),
+            ],
+          ),
         ),
       ),
     );
