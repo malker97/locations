@@ -14,11 +14,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Location',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Location Demo Home Page'),
     );
   }
 }
@@ -116,14 +117,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? CircularProgressIndicator()
                 : Column(
                     children: [
+                      // In meters/second
+                      // Text('Speed: ${_currentLocation != null ? mph.toInt() : 0.0 } mph'),
+                      SizedBox(
+                        height: 100,
+                        child: AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 300),
+                          style: TextStyle(
+                            fontSize: _currentLocation != null ? mph : 0.0,
+                            color: Colors.black,
+                          ),
+                          child: Text(
+                            '${_currentLocation != null ? mph.toInt() : 0.0 } mph',
+                          ),
+                        ),
+                      ),
+                      Text('Speed Limit: $speedLimit mph'),
                       Text('Latitude: ${_currentLocation!.latitude}'),
                       Text('Longitude: ${_currentLocation!.longitude}'),
                       Text('Accuracy: ${_currentLocation!.accuracy}'),
                       Text('Altitude: ${_currentLocation!.altitude}'),
-                      // In meters/second
-                      Text('Speed: ${_currentLocation != null ? mph.toInt() : 0.0 } mph'),
                       Text('Speed Accuracy: ${_currentLocation!.speedAccuracy}'),
-                      Text('Speed Limit: $speedLimit mph'),
+                      
                     ],
                   ),
             ],
