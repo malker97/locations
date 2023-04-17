@@ -40,6 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String _speedLimit = "";
   int speedLimit = 0;
 
+  bool _hideText = true;
+
   Color backgroundColor = Colors.lightGreen;
 
   void getCurrentLocation(){
@@ -110,6 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         color: backgroundColor, // 设置背景颜色为绿色
         child: Center(
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _hideText = !_hideText; // 切换文本可见性
+              });
+            },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -132,16 +140,30 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                      Text('Speed Limit: $speedLimit mph'),
-                      Text('Latitude: ${_currentLocation!.latitude}'),
-                      Text('Longitude: ${_currentLocation!.longitude}'),
-                      Text('Accuracy: ${_currentLocation!.accuracy}'),
-                      Text('Altitude: ${_currentLocation!.altitude}'),
-                      Text('Speed Accuracy: ${_currentLocation!.speedAccuracy}'),
+                      // Text('Speed Limit: $speedLimit mph'),
+                      // Text('Latitude: ${_currentLocation!.latitude}'),
+                      // Text('Longitude: ${_currentLocation!.longitude}'),
+                      // Text('Accuracy: ${_currentLocation!.accuracy}'),
+                      // Text('Altitude: ${_currentLocation!.altitude}'),
+                      // Text('Speed Accuracy: ${_currentLocation!.speedAccuracy}'),
+                      Visibility( // 包装其他的 Text 小部件
+                        visible: !_hideText, // 显示/隐藏的条件
+                        child: Column(
+                          children: [
+                            Text('Speed Limit: $speedLimit mph'),
+                            Text('Latitude: ${_currentLocation!.latitude}'),
+                            Text('Longitude: ${_currentLocation!.longitude}'),
+                            Text('Accuracy: ${_currentLocation!.accuracy}'),
+                            Text('Altitude: ${_currentLocation!.altitude}'),
+                            Text('Speed Accuracy: ${_currentLocation!.speedAccuracy}'),
+                          ],
+                        ),
+                      ),
                       
                     ],
                   ),
             ],
+          ),
           ),
         ),
       ),
