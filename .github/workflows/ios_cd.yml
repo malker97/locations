@@ -1,7 +1,7 @@
 # cd.yml
 name: CD
 # set the trigger to run on push to master
-on: workflow_dispatch:
+on: workflow_dispatch
 jobs:
  deploy_ios:
     name: Deploy beta build to TestFlight
